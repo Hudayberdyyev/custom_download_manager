@@ -14,7 +14,7 @@ final internal class SessionManager: NSObject, AVAssetDownloadDelegate {
     static let shared = SessionManager()
     
     internal let homeDirectoryURL = URL(fileURLWithPath: NSHomeDirectory())
-    private var session: AVAssetDownloadURLSession?
+    private var session: AVAssetDownloadURLSession!
     internal var downloadingMap = [AVAssetDownloadTask : HLSData]()
     
     override private init() {
@@ -25,15 +25,13 @@ final internal class SessionManager: NSObject, AVAssetDownloadDelegate {
         /// Initialize session with downloads configuration
         session = AVAssetDownloadURLSession(configuration: configuration,
                                             assetDownloadDelegate: self,
-                                            delegateQueue: OperationQueue.main)
+                                            delegateQueue: OperationQueue())
         
         /// Restore downloads map
         restoreDownloadsMap()
     }
     
     private func restoreDownloadsMap() {
-        /// Safely retrieve session
-        guard let session = self.session else { return }
         
         /// Get all tasks
         session.getAllTasks { tasksArray in
@@ -66,8 +64,7 @@ final internal class SessionManager: NSObject, AVAssetDownloadDelegate {
         print("\(#function) -> \(assetExists(forName: hlsData.name))")
         guard assetExists(forName: hlsData.name) == false else { return }
         
-        guard let session = self.session,
-              let task = session.makeAssetDownloadTask(
+        guard let task = session.makeAssetDownloadTask(
                 asset: hlsData.urlAsset,
                 assetTitle: hlsData.name,
                 assetArtworkData: nil,

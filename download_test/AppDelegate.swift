@@ -33,8 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         HLSData.restoreDownloadsTasks()
     }
     
-    func applicationWillTerminate(_ application: UIApplication) {
-        
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        if identifier == K.FileStorage.DownloadsConfiguration.hlsIdentifier {
+            
+        }
     }
 
     // MARK: UISceneSession Lifecycle

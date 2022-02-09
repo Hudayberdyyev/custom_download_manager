@@ -38,6 +38,20 @@ public class HLSData {
         return SessionManager.shared.homeDirectoryURL.appendingPathComponent(relativePath)
     }
     
+    public var offlineAssetSize: UInt64 {
+        guard state == .downloaded else { return 0 }
+        guard let relativePath = AssetStore.path(forName: name) else { return 0 }
+        let bundleURL = SessionManager.shared.homeDirectoryURL.appendingPathComponent(relativePath)
+        guard let subpaths = try? FileManager.default.subpathsOfDirectory(atPath: bundleURL.path) else { return 0 }
+        let size: UInt64 = subpaths.reduce(0) {
+            let filePath = bundleURL.appendingPathComponent($1).path
+            guard let fileAttribute = try? FileManager.default.attributesOfItem(atPath: filePath) else { return $0 }
+            guard let size = fileAttribute[FileAttributeKey.size] as? NSNumber else { return $0 }
+            return $0 + size.uint64Value
+        }
+        return size
+    }
+    
     /// Download state.
     public var state: State {
         
